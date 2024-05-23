@@ -1,32 +1,10 @@
-addEventListener('fetch', event => {
-  event.respondWith(proxy(event));
-});
-
-async function proxy(event) {
-  const getReqHeader = (key) => event.request.headers.get(key);
-
-  let url = new URL(event.request.url);
-  url.hostname = "vip.tuzi226.top";
-
-  let parameter = {
-    headers: {
-      'Host': 'vip.tuzi226.top',
-      'User-Agent': getReqHeader("User-Agent"),
-      'Accept': getReqHeader("Accept"),
-      'Accept-Language': getReqHeader("Accept-Language"),
-      'Accept-Encoding': getReqHeader("Accept-Encoding"),
-      'Connection': 'keep-alive',
-      'Cache-Control': 'max-age=0'
-    }
-  };
-
-  if (event.request.headers.has("Referer")) {
-    parameter.headers.Referer = getReqHeader("Referer");
-  }
-
-  if (event.request.headers.has("Origin")) {
-    parameter.headers.Origin = getReqHeader("Origin");
-  }
-
-  return fetch(new Request(url, event.request), parameter);
-}
+export default {
+  async fetch(request, env) {
+    const _url = new URL(request.url);
+    _url.hostname = _url.pathname.startsWith("/gh/")
+      ? "cdn.jsdelivr.net"
+      : "vip.tuzi226.top";
+    const req = new Request(_url, request);
+    return fetch(req);
+  },
+};
